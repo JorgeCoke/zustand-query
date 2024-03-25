@@ -1,30 +1,28 @@
-# React + TypeScript + Vite
+<p align="center">
+    <img alt="Zustand and Fetch logo" src="repo-logo.png" width="512"/>
+</p>
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# 🐻 Zustand Query + Async Fetch Query HTTP Api Requests [Lab 🧪]
 
-Currently, two official plugins are available:
+Enhanced Zustand to query HTTP API Requests, including loading state and error handling with Zustand, without any extra data-fetching library
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What's included?
 
-## Expanding the ESLint configuration
+- React: https://react.dev/
+- Zustand: https://github.com/pmndrs/zustand
+- Typescript: https://www.typescriptlang.org/
 
-If you are developing a production application, we recommend updating the configuration to enable type aware lint rules:
+## Features
 
-- Configure the top-level `parserOptions` property like this:
+- **State management** with Zustand
+- **Loading state** while fetching http requests and **error handling** out-of-the-box, with zero-config (can be easly _customized_)
+- Generic Reset action. **Reset your store** to its initial state
+- **Extended Set action**. Call you Set action directly from your components
+- Typescript's **type safety**
 
-```js
-export default {
-  // other rules...
-  parserOptions: {
-    ecmaVersion: 'latest',
-    sourceType: 'module',
-    project: ['./tsconfig.json', './tsconfig.node.json'],
-    tsconfigRootDir: __dirname,
-  },
-}
+### Set up
+
 ```
-
-- Replace `plugin:@typescript-eslint/recommended` to `plugin:@typescript-eslint/recommended-type-checked` or `plugin:@typescript-eslint/strict-type-checked`
-- Optionally add `plugin:@typescript-eslint/stylistic-type-checked`
-- Install [eslint-plugin-react](https://github.com/jsx-eslint/eslint-plugin-react) and add `plugin:react/recommended` & `plugin:react/jsx-runtime` to the `extends` list
+npm ci                          # Install dependencies
+npm run dev                     # Launch project locally
+```

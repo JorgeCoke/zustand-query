@@ -21,9 +21,9 @@ export const usePokemonStore = create<
   State & Actions & QueryStore<typeof initialState>
 >()(
   immer((set, get) => ({
-    ...queryStore(set, initialState),
+    ...queryStore(set, get, initialState),
     doGetPokemon: async (id: number) => {
-      const pokemon = await get().query(getPokemonById(id));
+      const pokemon = await get().query(() => getPokemonById(id));
       set((state) => {
         state.pokemon = pokemon;
       });

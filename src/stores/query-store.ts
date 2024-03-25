@@ -2,15 +2,16 @@
 export type QueryStore<I> = {
   isLoading: boolean;
   isError: boolean;
-  query: <R>(fn: Promise<R | undefined>) => Promise<R | undefined>;
+  query: <R>(fn: () => Promise<R | undefined>) => Promise<R | undefined>;
   reset: () => void;
   set: (fn: (a: I) => void) => void;
 };
 
 export const queryStore: <I extends object>(
   set: (setFn: (a: QueryStore<I> & typeof initialState) => void) => void,
+  get: () => QueryStore<I> & typeof initialState,
   initialState: I
-) => QueryStore<I> & typeof initialState = (set, initialState) => {
+) => QueryStore<I> & typeof initialState = (set, _get, initialState) => {
   return {
     ...initialState,
     isLoading: false,
@@ -20,8 +21,8 @@ export const queryStore: <I extends object>(
         state.isLoading = true;
         state.isError = false;
       });
-      const result = await fn;
       await new Promise((r) => setTimeout(r, 1000)); // Simulate slow HTTP request
+      const result = await fn();
       set((state) => {
         state.isLoading = false;
         state.isError = !result;
