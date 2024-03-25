@@ -1,35 +1,55 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import "./App.css";
+import { useCounterStore } from "./stores/useCounterStore";
+import { usePokemonStore } from "./stores/usePokemonStore";
 
 function App() {
-  const [count, setCount] = useState(0)
+  const { count, increment, decrement } = useCounterStore();
+  const { loading, error, fetchPokemon, pokemon } = usePokemonStore();
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
+      <h1>Zustand + HTTP Query Fetch</h1>
+      <div style={{ display: "flex", justifyContent: "center", gap: "1rem" }}>
+        <button onClick={() => decrement(1)}>-</button>
         <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
+          Number is{" "}
+          <code style={{ fontWeight: "bold", fontSize: "1rem" }}>{count}</code>
         </p>
+        <button onClick={() => increment(1)}>+</button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+      <br />
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          gap: "1rem",
+        }}
+      >
+        <button
+          aria-disabled={loading}
+          disabled={loading}
+          onClick={() => fetchPokemon(count)}
+        >
+          {loading ? "Loading..." : "Fetch Pokemon Info"}
+        </button>
+        {pokemon && (
+          <>
+            <img
+              style={{ width: "150px" }}
+              src={pokemon.sprites.front_default}
+            />
+            <p style={{ fontWeight: "bold" }}>{pokemon.name}</p>
+          </>
+        )}
+        {error && (
+          <p style={{ fontWeight: "bold", color: "red" }}>
+            Error trying to load Pokemon info
+          </p>
+        )}
+      </div>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
