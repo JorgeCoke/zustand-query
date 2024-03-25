@@ -1,26 +1,24 @@
 // NOTE: prefix all states with "is"
-export type FetcherState = {
+export type QueryState = {
   isLoading: boolean;
   isError: boolean;
-  query: <R>(url: string) => Promise<R | undefined>;
+  query: <R>(fn: Promise<R | undefined>) => Promise<R | undefined>;
   reset: () => void;
 };
 
-export const fetcherState: <S extends FetcherState, I extends object>(
+export const queryStore: <S extends QueryState, I extends object>(
   set: (setFn: (a: S) => void) => void,
   initialState: I
-) => FetcherState = (set, initialState) => {
+) => QueryState = (set, initialState) => {
   return {
     isLoading: false,
     isError: false,
-    query: async (url: string) => {
+    query: async (fn) => {
       set((state) => {
         state.isLoading = true;
         state.isError = false;
       });
-      const result = await fetch(url)
-        .then(async (res) => await res.json())
-        .catch(() => undefined);
+      const result = await fn;
       await new Promise((r) => setTimeout(r, 1000)); // Simulate slow HTTP request
       set((state) => {
         state.isLoading = false;

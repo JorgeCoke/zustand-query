@@ -1,8 +1,8 @@
 import { create } from "zustand";
 import { immer } from "zustand/middleware/immer";
-import { FetcherState, fetcherState } from "./fetcherStore";
-
-type Pokemon = { id: number; name: string; sprites: { front_default: string } };
+import { QueryState, queryStore } from "./query-store";
+import { getPokemonById } from "../services/pokemon.service";
+import { Pokemon } from "../types/pokemon";
 
 type State = {
   pokemon?: Pokemon;
@@ -17,14 +17,12 @@ const initialState: State = {
   pokemon: undefined,
 };
 
-export const usePokemonStore = create<State & Actions & FetcherState>()(
+export const usePokemonStore = create<State & Actions & QueryState>()(
   immer((set, get) => ({
     ...initialState,
-    ...fetcherState(set, initialState),
-    doGetPokemon: async (number: number) => {
-      const pokemon = await get().query<Pokemon>(
-        `https://pokeapi.co/api/v2/pokemon/${number}`
-      );
+    ...queryStore(set, initialState),
+    doGetPokemon: async (id: number) => {
+      const pokemon = await get().query(getPokemonById(id));
       set((state) => {
         state.pokemon = pokemon;
       });
