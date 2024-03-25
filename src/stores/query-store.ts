@@ -1,16 +1,18 @@
-// NOTE: prefix all states with "is"
-export type QueryState = {
+// NOTE: Best practice -> Prefix all states with "is"
+export type QueryStore<I> = {
   isLoading: boolean;
   isError: boolean;
   query: <R>(fn: Promise<R | undefined>) => Promise<R | undefined>;
   reset: () => void;
+  set: (fn: (a: I) => void) => void;
 };
 
-export const queryStore: <S extends QueryState, I extends object>(
-  set: (setFn: (a: S) => void) => void,
+export const queryStore: <I extends object>(
+  set: (setFn: (a: QueryStore<I> & typeof initialState) => void) => void,
   initialState: I
-) => QueryState = (set, initialState) => {
+) => QueryStore<I> & typeof initialState = (set, initialState) => {
   return {
+    ...initialState,
     isLoading: false,
     isError: false,
     query: async (fn) => {
@@ -35,5 +37,6 @@ export const queryStore: <S extends QueryState, I extends object>(
           state.isLoading = false;
         });
       }),
+    set,
   };
 };

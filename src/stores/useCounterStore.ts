@@ -5,7 +5,7 @@ type State = {
   count: number;
 };
 
-// NOTE: prefix all actions with "do"
+// NOTE: Best practice -> Prefix all actions with "do"
 type Actions = {
   doIncrement: (qty: number) => void;
   doDecrement: (qty: number) => void;

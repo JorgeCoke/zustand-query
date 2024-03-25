@@ -4,7 +4,7 @@ import { usePokemonStore } from "./stores/usePokemonStore";
 
 function App() {
   const { count, doIncrement, doDecrement } = useCounterStore();
-  const { isLoading, isError, doGetPokemon, pokemon, reset } =
+  const { isLoading, isError, doGetPokemon, pokemon, reset, set } =
     usePokemonStore();
 
   return (
@@ -53,7 +53,18 @@ function App() {
           disabled={isLoading}
           onClick={() => reset()}
         >
-          Reset
+          Generic Reset Example
+        </button>
+        <button
+          aria-disabled={isLoading}
+          disabled={isLoading}
+          onClick={() => {
+            set((state) => {
+              state.pokemon = undefined;
+            });
+          }}
+        >
+          Generic Set Example
         </button>
       </div>
     </>
