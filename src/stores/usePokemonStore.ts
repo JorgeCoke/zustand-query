@@ -8,8 +8,9 @@ type State = {
   pokemon?: Pokemon;
 };
 
+// NOTE: prefix all actions with "do"
 type Actions = {
-  fetchPokemon: (number: number) => void;
+  doGetPokemon: (number: number) => void;
 };
 
 const initialState: State = {
@@ -19,8 +20,8 @@ const initialState: State = {
 export const usePokemonStore = create<State & Actions & FetcherState>()(
   immer((set, get) => ({
     ...initialState,
-    ...fetcherState(set),
-    fetchPokemon: async (number: number) => {
+    ...fetcherState(set, initialState),
+    doGetPokemon: async (number: number) => {
       const pokemon = await get().query<Pokemon>(
         `https://pokeapi.co/api/v2/pokemon/${number}`
       );

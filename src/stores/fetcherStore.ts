@@ -1,29 +1,41 @@
+// NOTE: prefix all states with "is"
 export type FetcherState = {
-  loading: boolean;
-  error: boolean;
-  query: <T>(url: string) => Promise<T | undefined>;
+  isLoading: boolean;
+  isError: boolean;
+  query: <R>(url: string) => Promise<R | undefined>;
+  reset: () => void;
 };
 
-export const fetcherState: <T extends FetcherState>(
-  set: (setFn: (a: T) => void) => void
-) => FetcherState = (set) => {
+export const fetcherState: <S extends FetcherState, I extends object>(
+  set: (setFn: (a: S) => void) => void,
+  initialState: I
+) => FetcherState = (set, initialState) => {
   return {
-    loading: false,
-    error: false,
+    isLoading: false,
+    isError: false,
     query: async (url: string) => {
       set((state) => {
-        state.loading = true;
-        state.error = false;
+        state.isLoading = true;
+        state.isError = false;
       });
       const result = await fetch(url)
         .then(async (res) => await res.json())
         .catch(() => undefined);
       await new Promise((r) => setTimeout(r, 1000)); // Simulate slow HTTP request
       set((state) => {
-        state.loading = false;
-        state.error = !result;
+        state.isLoading = false;
+        state.isError = !result;
       });
       return result;
     },
+    reset: () =>
+      set((state) => {
+        const keys = Object.keys(initialState) as Array<keyof typeof state>;
+        keys.forEach((k) => {
+          state[k] = (initialState as never)[k];
+          state.isError = false;
+          state.isLoading = false;
+        });
+      }),
   };
 };

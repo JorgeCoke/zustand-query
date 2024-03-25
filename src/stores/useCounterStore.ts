@@ -5,9 +5,10 @@ type State = {
   count: number;
 };
 
+// NOTE: prefix all actions with "do"
 type Actions = {
-  increment: (qty: number) => void;
-  decrement: (qty: number) => void;
+  doIncrement: (qty: number) => void;
+  doDecrement: (qty: number) => void;
 };
 
 const initialState: State = {
@@ -17,11 +18,11 @@ const initialState: State = {
 export const useCounterStore = create<State & Actions>()(
   immer((set) => ({
     ...initialState,
-    increment: (qty: number) =>
+    doIncrement: (qty: number) =>
       set((state) => {
         state.count += qty;
       }),
-    decrement: (qty: number) =>
+    doDecrement: (qty: number) =>
       set((state) => {
         state.count -= qty;
       }),
