@@ -22,11 +22,15 @@ export const usePokemonStore = create<
 >()(
   immer((set, get) => ({
     ...queryStore(set, get, initialState),
-    doGetPokemon: async (id: number) => {
-      const pokemon = await get().query(() => getPokemonById(id));
-      set((state) => {
-        state.pokemon = pokemon;
-      });
-    },
+    doGetPokemon: (id: number) =>
+      get().query(
+        () => getPokemonById(id),
+        `getPokemonById(${id})`,
+        (result) => {
+          set((state) => {
+            state.pokemon = result;
+          });
+        }
+      ),
   }))
 );

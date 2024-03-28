@@ -1,33 +1,59 @@
+export type QueryStore<I> = QueryStoreState & QueryStoreActions<I>;
+
 // NOTE: Best practice -> Prefix all states with "is"
-export type QueryStore<I> = {
+type QueryStoreState = {
   isLoading: boolean;
   isError: boolean;
-  query: <R>(fn: () => Promise<R | undefined>) => Promise<R | undefined>;
+  queryKeys: string[];
+};
+
+type QueryStoreActions<I> = {
+  query: <R>(
+    queryFn: () => Promise<R>,
+    key: string,
+    onCompleted: (result: R) => void | Promise<void>
+  ) => Promise<void>;
   reset: () => void;
   set: (fn: (a: I) => void) => void;
+};
+
+const initialQueryStoreState: QueryStoreState = {
+  isLoading: false,
+  isError: false,
+  queryKeys: [],
 };
 
 export const queryStore: <I extends object>(
   set: (setFn: (a: QueryStore<I> & typeof initialState) => void) => void,
   get: () => QueryStore<I> & typeof initialState,
   initialState: I
-) => QueryStore<I> & typeof initialState = (set, _get, initialState) => {
+) => QueryStore<I> & typeof initialState = (set, get, initialState) => {
   return {
     ...initialState,
-    isLoading: false,
-    isError: false,
-    query: async (fn) => {
-      set((state) => {
-        state.isLoading = true;
-        state.isError = false;
-      });
-      await new Promise((r) => setTimeout(r, 1000)); // Simulate slow HTTP request
-      const result = await fn();
-      set((state) => {
-        state.isLoading = false;
-        state.isError = !result;
-      });
-      return result;
+    ...initialQueryStoreState,
+    query: async (fn, key, onCompleted) => {
+      if (!get().queryKeys.includes(key)) {
+        set((state) => {
+          state.isError = false;
+          state.isLoading = true;
+          state.queryKeys = [...state.queryKeys, key];
+        });
+        await new Promise((r) => setTimeout(r, 2000)); // Simulate slow HTTP request
+        const result = await fn().catch((err: Error) => {
+          set((state) => {
+            state.isError = true;
+            state.isLoading = state.queryKeys.length > 1;
+            state.queryKeys = [...state.queryKeys.filter((e) => e !== key)];
+          });
+          throw err;
+        });
+        set((state) => {
+          state.isError = false;
+          state.isLoading = state.queryKeys.length > 1;
+          state.queryKeys = [...state.queryKeys.filter((e) => e !== key)];
+        });
+        await onCompleted(result);
+      }
     },
     reset: () =>
       set((state) => {
@@ -36,6 +62,7 @@ export const queryStore: <I extends object>(
           state[k] = (initialState as never)[k];
           state.isError = false;
           state.isLoading = false;
+          state.queryKeys = [];
         });
       }),
     set,

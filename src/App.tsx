@@ -53,7 +53,7 @@ function App() {
           disabled={isLoading}
           onClick={() => reset()}
         >
-          Generic Reset Example
+          Reset Example
         </button>
         <button
           aria-disabled={isLoading}
@@ -64,7 +64,10 @@ function App() {
             });
           }}
         >
-          Generic Set Example
+          Set Example
+        </button>
+        <button onClick={() => doGetPokemon(count)}>
+          Click Click! Duplicated Requests are ignored!
         </button>
       </div>
     </>
