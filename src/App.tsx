@@ -4,7 +4,7 @@ import { usePokemonStore } from "./stores/usePokemonStore";
 
 function App() {
   const { count, doIncrement, doDecrement } = useCounterStore();
-  const { isLoading, isError, doGetPokemon, pokemon, reset, set } =
+  const { isLoading, isError, doGetPokemonById, pokemon, reset, set } =
     usePokemonStore();
 
   return (
@@ -30,7 +30,7 @@ function App() {
         <button
           aria-disabled={isLoading}
           disabled={isLoading}
-          onClick={() => doGetPokemon(count)}
+          onClick={() => doGetPokemonById(count)}
         >
           {isLoading ? "Loading..." : "Get Pokemon Info"}
         </button>
@@ -66,7 +66,7 @@ function App() {
         >
           Set Example
         </button>
-        <button onClick={() => doGetPokemon(count)}>
+        <button onClick={() => doGetPokemonById(count)}>
           Click Click! Duplicated Requests are ignored!
         </button>
       </div>

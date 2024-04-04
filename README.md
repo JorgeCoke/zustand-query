@@ -16,6 +16,7 @@ Enhanced Zustand to query HTTP API Requests, including loading state and error h
 
 - **State management** with Zustand
 - **Loading state** while fetching http requests and **error handling** out-of-the-box, with zero-config (can be easly _customized_)
+- **React-Query alike API**
 - Generic Reset action. **Reset your store** to its initial state
 - **Extended Set action**. Call your Set action directly from your components
 - Query data from your API. **Duplicated query actions are ignored!**

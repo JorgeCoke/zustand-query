@@ -8,11 +8,11 @@ type QueryStoreState = {
 };
 
 type QueryStoreActions<I> = {
-  query: <R>(
-    queryFn: () => Promise<R>,
-    key: string,
-    onCompleted: (result: R) => void | Promise<void>
-  ) => Promise<void>;
+  query: <R>(params: {
+    queryFn: () => Promise<R>;
+    queryKey?: string;
+    onSuccess?: (result: R) => void | Promise<void>;
+  }) => Promise<void>;
   reset: () => void;
   set: (fn: (a: I) => void) => void;
 };
@@ -31,28 +31,40 @@ export const queryStore: <I extends object>(
   return {
     ...initialState,
     ...initialQueryStoreState,
-    query: async (fn, key, onCompleted) => {
-      if (!get().queryKeys.includes(key)) {
+    query: async ({ queryFn, queryKey, onSuccess }) => {
+      if (!queryKey || (queryKey && !get().queryKeys.includes(queryKey))) {
         set((state) => {
           state.isError = false;
           state.isLoading = true;
-          state.queryKeys = [...state.queryKeys, key];
+          if (queryKey) {
+            state.queryKeys = [...state.queryKeys, queryKey];
+          }
         });
         await new Promise((r) => setTimeout(r, 2000)); // Simulate slow HTTP request
-        const result = await fn().catch((err: Error) => {
+        const result = await queryFn().catch((err: Error) => {
           set((state) => {
             state.isError = true;
             state.isLoading = state.queryKeys.length > 1;
-            state.queryKeys = [...state.queryKeys.filter((e) => e !== key)];
+            if (queryKey) {
+              state.queryKeys = [
+                ...state.queryKeys.filter((e) => e !== queryKey),
+              ];
+            }
           });
           throw err;
         });
         set((state) => {
           state.isError = false;
           state.isLoading = state.queryKeys.length > 1;
-          state.queryKeys = [...state.queryKeys.filter((e) => e !== key)];
+          if (queryKey) {
+            state.queryKeys = [
+              ...state.queryKeys.filter((e) => e !== queryKey),
+            ];
+          }
         });
-        await onCompleted(result);
+        if (onSuccess) {
+          await onSuccess(result);
+        }
       }
     },
     reset: () =>

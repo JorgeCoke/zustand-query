@@ -10,7 +10,7 @@ type State = {
 
 // NOTE: Best practice -> Prefix all actions with "do"
 type Actions = {
-  doGetPokemon: (number: number) => void;
+  doGetPokemonById: (number: number) => void;
 };
 
 const initialState: State = {
@@ -22,15 +22,15 @@ export const usePokemonStore = create<
 >()(
   immer((set, get) => ({
     ...queryStore(set, get, initialState),
-    doGetPokemon: (id: number) =>
-      get().query(
-        () => getPokemonById(id),
-        `getPokemonById(${id})`,
-        (result) => {
+    doGetPokemonById: (id) =>
+      get().query({
+        queryFn: () => getPokemonById(id),
+        queryKey: `getPokemonById(${id})`,
+        onSuccess: (result) => {
           set((state) => {
             state.pokemon = result;
           });
-        }
-      ),
+        },
+      }),
   }))
 );
