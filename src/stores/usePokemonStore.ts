@@ -31,6 +31,9 @@ export const usePokemonStore = create<
             state.pokemon = result;
           });
         },
+        onError: (error) => {
+          alert(error);
+        },
       }),
   }))
 );

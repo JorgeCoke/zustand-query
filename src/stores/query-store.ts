@@ -1,3 +1,4 @@
+export type HttpError = { message: string; code: number };
 export type QueryStore<I> = QueryStoreState & QueryStoreActions<I>;
 
 // NOTE: Best practice -> Prefix all states with "is"
@@ -12,6 +13,7 @@ type QueryStoreActions<I> = {
     queryFn: () => Promise<R>;
     queryKey?: string;
     onSuccess?: (result: R) => void | Promise<void>;
+    onError?: (error: HttpError) => void | Promise<void>;
   }) => Promise<void>;
   reset: () => void;
   set: (fn: (a: I) => void) => void;
@@ -31,7 +33,7 @@ export const queryStore: <I extends object>(
   return {
     ...initialState,
     ...initialQueryStoreState,
-    query: async ({ queryFn, queryKey, onSuccess }) => {
+    query: async ({ queryFn, queryKey, onSuccess, onError }) => {
       if (!queryKey || (queryKey && !get().queryKeys.includes(queryKey))) {
         set((state) => {
           state.isError = false;
@@ -41,7 +43,10 @@ export const queryStore: <I extends object>(
           }
         });
         await new Promise((r) => setTimeout(r, 2000)); // Simulate slow HTTP request
-        const result = await queryFn().catch((err: Error) => {
+        const result = await queryFn().catch(async (error: HttpError) => {
+          if (onError) {
+            await onError(error);
+          }
           set((state) => {
             state.isError = true;
             state.isLoading = state.queryKeys.length > 1;
@@ -51,8 +56,11 @@ export const queryStore: <I extends object>(
               ];
             }
           });
-          throw err;
+          throw error;
         });
+        if (onSuccess) {
+          await onSuccess(result);
+        }
         set((state) => {
           state.isError = false;
           state.isLoading = state.queryKeys.length > 1;
@@ -62,9 +70,6 @@ export const queryStore: <I extends object>(
             ];
           }
         });
-        if (onSuccess) {
-          await onSuccess(result);
-        }
       }
     },
     reset: () =>
